@@ -1,4 +1,4 @@
-Bootfile Configuration Storage [![Build Status](https://travis-ci.org/spidapp/spid-storage-configuration-bootfile.svg?branch=master)](https://travis-ci.org/spidapp/spid-storage-configuration-bootfile)
+JSON File Configuration Storage [![Build Status](https://travis-ci.org/spidapp/spid-storage-configuration-bootfile.svg?branch=master)](https://travis-ci.org/spidapp/spid-storage-configuration-bootfile)
 =========================================
 
 Configuration storage used at boot-time to load the `storage` value that specify the real-storage backend.
