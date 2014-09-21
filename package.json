@@ -1,0 +1,22 @@
+{
+  "name": "spid-storage-configuration-jsonfile",
+  "version": "0.0.1",
+  "description": "[Plugin] Spid Json File Configuration based Storage",
+  "main": "JSONFileConfigurationStorage.js",
+  "author": "Francois-Guillaume Ribreau <npm@fgribreau.com> (http://fgribreau.com/)",
+  "license": "MIT",
+  "dependencies": {
+    "async": "^0.9.0",
+    "file-ensure": "^0.3.0",
+    "jsonfile": "^2.0.0",
+    "lodash": "^2.4.1",
+    "spid-storage-configuration-interface": "~0.0.2"
+  },
+  "scripts": {
+    "test": "mocha test/"
+  },
+  "devDependencies": {
+    "chai": "^1.9.1",
+    "mocha": "^1.21.4"
+  }
+}
