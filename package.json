@@ -1,6 +1,6 @@
 {
   "name": "spid-storage-configuration-jsonfile",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "[Plugin] Spid Json File Configuration based Storage",
   "main": "JSONFileConfigurationStorage.js",
   "author": "Francois-Guillaume Ribreau <npm@fgribreau.com> (http://fgribreau.com/)",
