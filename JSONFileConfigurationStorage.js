@@ -27,7 +27,7 @@ JSONFileConfigurationStorage.prototype.init = function (configuration, f) {
      * @type {String} file name
      * @default `this._jsonfilename` value
      */
-    filename: this._jsonfilename,
+    filename: this._jsonfilename
   }, _.partialRight(this.applyConfiguration.bind(this), f));
 };
 
@@ -138,16 +138,22 @@ JSONFileConfigurationStorage.prototype.watch = function (prefix, keys, f) {
 
 /**
  * Unwatch keys
+ * @param  {String} prefix
  * @param  {Array|Undefined} keys
  *                           if `keys` is not specified, all watchers will be removed
  * @param  {Function} f(err)
- * @return {[type]}     [description]
  */
 JSONFileConfigurationStorage.prototype.unwatch = function (prefix, keys, f) {
   f = _.isFunction(f) ? f : _.noop;
 
   if (!keys) {
-    this._listeners = [];
+    if (!prefix) {
+      // dispose configuration
+      this._listeners = [];
+      return f();
+    }
+
+    // @todo: remove all the keys with the given prefix
     return f();
   }
 
@@ -220,7 +226,7 @@ function prefixProperties(properties, prefix) {
 }
 
 /**
- * @param  {String|Array[String]} keys
+ * @param  {Array[String]} keys
  * @param  {String} prefix
  * @return {Object}        e.g. {prefixedKey : rawKeyName, prefixedKey2 : rawKeyName2}
  */
