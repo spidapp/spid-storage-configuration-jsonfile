@@ -44,7 +44,7 @@ JSONFileConfigurationStorage.prototype.applyConfiguration = function (stale, fre
 };
 
 JSONFileConfigurationStorage.prototype.dispose = function (f) {
-  this.unwatch(null, f);
+  this.unwatch(null, null, f);
 };
 
 JSONFileConfigurationStorage.prototype.read = function (prefix, keys, f) {
@@ -63,7 +63,12 @@ JSONFileConfigurationStorage.prototype.read = function (prefix, keys, f) {
      * This method is clearly not efficient, we could simply save the object
      * inside an in-memory cache BUT it could trigger inconsistencies
      */
-    f(null, _.pick(obj, withPrefix(keys, prefix)));
+    var result = {};
+    _.map(keys, function (key) {
+      result[key] = obj[addPrefix(prefix, key)];
+    });
+
+    f(null, result);
   }.bind(this));
 };
 
@@ -79,8 +84,7 @@ JSONFileConfigurationStorage.prototype.write = function (prefix, properties, f) 
     } // @todo use SpidException
 
     // @todo this method is not atomic #filesystem
-
-    _.forEach(withPrefix(properties, prefix), function (valueToWrite, key) {
+    _.forEach(prefixProperties(properties, prefix), function (valueToWrite, key) {
       if (valueToWrite === undefined) {
         delete obj[key];
       } else {
@@ -101,18 +105,28 @@ JSONFileConfigurationStorage.prototype.write = function (prefix, properties, f) 
 
 /**
  * [write description]
- * @param  {[type]} key  [description]
+ * @param  {String|Array[String]} keys  [description]
  * @param  {Function} f(err)
  */
-JSONFileConfigurationStorage.prototype.remove = function (prefix, key, f) {
-  this.write(withPrefix(key, prefix), undefined, f);
+JSONFileConfigurationStorage.prototype.remove = function (prefix, keys, f) {
+
+  if (_.isString(keys)) {
+    var undefinedProperty = {};
+    undefinedProperty[keys] = undefined;
+    return this.write(prefix, undefinedProperty, f);
+  }
+
+  this.write(prefix, _.reduce(keys, function (undefinedProperties, key) {
+    undefinedProperties[key] = undefined;
+    return undefinedProperties;
+  }, {}), f);
 };
 
 
 /**
  * Watch keys for change
  * @param {Array[String]} keys array of keys to watch
- * @param {Function} f(null, fresh, keys)
+ * @param {Function} f(updatedProperties)
  */
 JSONFileConfigurationStorage.prototype.watch = function (prefix, keys, f) {
   this._listeners.push({
@@ -160,7 +174,7 @@ JSONFileConfigurationStorage.prototype.notifyChange = function (prefix, properti
     // "c" key/value.
 
     var propertiesForCurrentListener = _.intersection(prefixedKeys, _.keys(listener.keys)).reduce(function (fresh, prefixedKey) {
-      fresh[prefixedKey] = properties[prefixedKey];
+      fresh[listener.keys[prefixedKey]] = properties[listener.keys[prefixedKey]];
       return fresh;
     }, {});
 
@@ -188,6 +202,21 @@ function withPrefix(keys, prefix) {
 
 function addPrefix(prefix, key) {
   return prefix + '.' + key;
+}
+
+/**
+ * Return object properties with prefixed keys
+ * @param {Object} properties e.g. {key1: value1, key2: value2}
+ * @param prefix
+ * @return {Object} e.g. {prefixedKey1: value1, prefixedKey2: value2}
+ */
+function prefixProperties(properties, prefix) {
+  var prefixedProperties = {};
+  _.map(properties, function (value, key, properties) {
+    prefixedProperties[addPrefix(prefix, key)] = value;
+  });
+
+  return prefixedProperties;
 }
 
 /**
